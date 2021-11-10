@@ -1,4 +1,5 @@
 import http from '../interceptor';
+import queryString from 'query-string';
 
 export const registerRequest = data => http.post('registration', data);
 export const loginRequest = data => http.post('login', data);
@@ -30,7 +31,11 @@ export const dataForContest = data =>
   http.post('/contests/dataForContest', data);
 
 // export const updateContest = data => http.patch(`/contests/${data???id}`, data);
-export const updateContest = data => http.post('/contests/updateContest', data);
+export const updateContest = data => {
+  console.log(data.get('contestId'));
+
+  return http.patch(`/contests/updateContest?${data}`, data);
+};
 
 // npm:query-string
 export const getCustomersContests = data =>
@@ -46,8 +51,8 @@ export const getActiveContests = ({
   industry,
   awardSort,
   ownEntries,
-}) =>
-  http.post('/contests/getAllContests', {
+}) => {
+  const opts = {
     offset,
     limit,
     typeIndex,
@@ -55,7 +60,12 @@ export const getActiveContests = ({
     industry,
     awardSort,
     ownEntries,
-  });
+  };
+
+  const optStr = queryString.stringify(opts);
+
+  return http.get(`/contests/getAllContests?${optStr}`);
+};
 
 // Параметры строки запроса:
 // `/contests?limit=${data.limit}` => '/contests'        => req.query.limit

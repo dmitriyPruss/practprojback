@@ -1,3 +1,5 @@
+const querystring = require('querystring');
+
 const db = require('../models');
 const ServerError = require('../errors/ServerError');
 const contestQueries = require('./queries/contestQueries');
@@ -99,6 +101,25 @@ module.exports.downloadFile = async (req, res, next) => {
 };
 
 module.exports.updateContest = async (req, res, next) => {
+  // const {
+  //   params: { contestId },
+  // } = req;
+
+  console.log(`req.params`, req.query);
+
+  console.log(`UPDATE - req.body`, req.body);
+
+  //  UPDATE - req.body [Object: null prototype] {
+  //    title: 'qqqquuu',
+  //    industry: 'Creative Agency',
+  //    focusOfWork: 'qqqquuu',
+  //    targetCustomer: 'qqquuu',
+  //    styleName: 'Classic',
+  //    typeOfName: 'Company',
+  //    contestType: 'name',
+  //    contestId: '9'
+  //  }
+
   if (req.file) {
     req.body.fileName = req.file.filename;
     req.body.originalFileName = req.file.originalname;
@@ -287,22 +308,32 @@ module.exports.getCustomersContests = (req, res, next) => {
 };
 
 module.exports.getContests = (req, res, next) => {
+  const {
+    query: { offset, limit, typeIndex, contestId, industry, awardSort },
+    tokenData: { userId },
+  } = req;
+
+  let ownEntries;
+  req.query.ownEntries === 'true'
+    ? (ownEntries = !ownEntries)
+    : (ownEntries = !!ownEntries);
+
   const predicates = UtilFunctions.createWhereForAllContests(
-    req.body.typeIndex,
-    req.body.contestId,
-    req.body.industry,
-    req.body.awardSort
+    typeIndex,
+    contestId,
+    industry,
+    awardSort
   );
   db.Contests.findAll({
     where: predicates.where,
     order: predicates.order,
-    limit: req.body.limit,
-    offset: req.body.offset ? req.body.offset : 0,
+    limit: limit,
+    offset: offset === 'undefined' ? 0 : offset,
     include: [
       {
         model: db.Offers,
-        required: req.body.ownEntries,
-        where: req.body.ownEntries ? { userId: req.tokenData.userId } : {},
+        required: ownEntries,
+        where: ownEntries ? { userId: req.tokenData.userId } : {},
         attributes: ['id'],
       },
     ],

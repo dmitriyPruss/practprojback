@@ -9,6 +9,14 @@ const upload = require('./../utils/fileUpload');
 
 const contestRouter = Router();
 // /contests
+
+contestRouter.get(
+  '/getAllContests',
+  checkToken.checkToken,
+  basicMiddlewares.onlyForCreative,
+  contestController.getContests
+);
+
 contestRouter.get(
   '/',
   checkToken.checkToken,
@@ -22,14 +30,7 @@ contestRouter.get(
   contestController.getContestById
 );
 
-contestRouter.post(
-  '/getAllContests',
-  checkToken.checkToken,
-  basicMiddlewares.onlyForCreative,
-  contestController.getContests
-);
-
-contestRouter.post(
+contestRouter.patch(
   '/updateContest',
   checkToken.checkToken,
   upload.updateContestFile,
