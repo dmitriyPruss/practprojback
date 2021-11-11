@@ -14,7 +14,7 @@ module.exports.dataForContest = async (req, res, next) => {
     const {
       body: { characteristic1, characteristic2 },
     } = req;
-    console.log(req.body, characteristic1, characteristic2);
+
     const types = [characteristic1, characteristic2, 'industry'].filter(
       Boolean
     );
@@ -30,10 +30,11 @@ module.exports.dataForContest = async (req, res, next) => {
       return next(new ServerError());
     }
     characteristics.forEach(characteristic => {
-      if (!response[characteristic.type]) {
-        response[characteristic.type] = [];
+      const { type, describe } = characteristic;
+      if (!response[type]) {
+        response[type] = [];
       }
-      response[characteristic.type].push(characteristic.describe);
+      response[type].push(describe);
     });
     res.send(response);
   } catch (err) {
@@ -62,7 +63,7 @@ module.exports.getContestById = async (req, res, next) => {
         {
           model: db.Offers,
           required: false,
-          where: role === CONSTANTS.CREATOR ? { userId: userId } : {},
+          where: role === CONSTANTS.CREATOR ? { userId } : {},
           attributes: { exclude: ['userId', 'contestId'] },
           include: [
             {
@@ -101,35 +102,24 @@ module.exports.downloadFile = async (req, res, next) => {
 };
 
 module.exports.updateContest = async (req, res, next) => {
-  // const {
-  //   params: { contestId },
-  // } = req;
+  const {
+    body,
+    file,
+    params: { contestId },
+    tokenData: { userId },
+  } = req;
 
-  console.log(`req.params`, req.query);
+  delete body.contestId;
 
-  console.log(`UPDATE - req.body`, req.body);
-
-  //  UPDATE - req.body [Object: null prototype] {
-  //    title: 'qqqquuu',
-  //    industry: 'Creative Agency',
-  //    focusOfWork: 'qqqquuu',
-  //    targetCustomer: 'qqquuu',
-  //    styleName: 'Classic',
-  //    typeOfName: 'Company',
-  //    contestType: 'name',
-  //    contestId: '9'
-  //  }
-
-  if (req.file) {
-    req.body.fileName = req.file.filename;
-    req.body.originalFileName = req.file.originalname;
+  if (file) {
+    body.fileName = file.filename;
+    body.originalFileName = file.originalname;
   }
-  const contestId = req.body.contestId;
-  delete req.body.contestId;
+
   try {
-    const updatedContest = await contestQueries.updateContest(req.body, {
+    const updatedContest = await contestQueries.updateContest(body, {
       id: contestId,
-      userId: req.tokenData.userId,
+      userId,
     });
     res.send(updatedContest);
   } catch (e) {
@@ -272,17 +262,15 @@ module.exports.setOfferStatus = async (req, res, next) => {
     }
   }
 };
-// req.query.limit
-// req.query.offset
-// req.query.status
+
 module.exports.getCustomersContests = (req, res, next) => {
   const {
-    query: { limit, offset, status },
+    query: { limit, offset, contestStatus },
     tokenData: { userId },
   } = req;
-  // contests = await db.Contests.findAll...
+
   db.Contests.findAll({
-    where: { status, userId },
+    where: { status: contestStatus, userId },
     limit,
     offset: offset === 'undefined' ? 0 : offset,
     order: [['id', 'DESC']],
@@ -327,13 +315,13 @@ module.exports.getContests = (req, res, next) => {
   db.Contests.findAll({
     where: predicates.where,
     order: predicates.order,
-    limit: limit,
+    limit,
     offset: offset === 'undefined' ? 0 : offset,
     include: [
       {
         model: db.Offers,
         required: ownEntries,
-        where: ownEntries ? { userId: req.tokenData.userId } : {},
+        where: ownEntries ? { userId } : {},
         attributes: ['id'],
       },
     ],

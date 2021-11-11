@@ -26,22 +26,15 @@ export const deleteCatalog = data => http.post('deleteCatalog', data);
 export const removeChatFromCatalog = data =>
   http.post('removeChatFromCatalog', data);
 export const changeCatalogName = data => http.post('updateNameCatalog', data);
+
 // Contests
-export const dataForContest = data =>
-  http.post('/contests/dataForContest', data);
+export const getCustomersContests = data => {
+  const { limit, offset, contestStatus } = data;
 
-// export const updateContest = data => http.patch(`/contests/${data???id}`, data);
-export const updateContest = data => {
-  console.log(data.get('contestId'));
+  const optStr = queryString.stringify({ limit, offset, contestStatus });
 
-  return http.patch(`/contests/updateContest?${data}`, data);
+  return http.get(`/contests/customers?${optStr}`);
 };
-
-// npm:query-string
-export const getCustomersContests = data =>
-  http.get(
-    `/contests?limit=${data.limit}&offset=${data.offset}&status=${data.contestStatus}`
-  );
 
 export const getActiveContests = ({
   offset,
@@ -64,15 +57,14 @@ export const getActiveContests = ({
 
   const optStr = queryString.stringify(opts);
 
-  return http.get(`/contests/getAllContests?${optStr}`);
+  return http.get(`/contests/all?${optStr}`);
 };
 
-// Параметры строки запроса:
-// `/contests?limit=${data.limit}` => '/contests'        => req.query.limit
-
-// Параметры маршрута:
-// `/contests/${data.limit}`       => '/contests/:limit' => req.params.limit
-
-// Отрефакторить (использовать params - параметры маршрута)
 export const getContestById = ({ contestId }) =>
   http.get(`/contests/${contestId}`);
+
+export const updateContest = data =>
+  http.patch(`/contests/${data.get('contestId')}`, data);
+
+export const dataForContest = data =>
+  http.post('/contests/dataForContest', data);

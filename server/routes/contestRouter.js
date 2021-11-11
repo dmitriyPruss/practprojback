@@ -1,46 +1,35 @@
 const { Router } = require('express');
-const basicMiddlewares = require('./../middlewares/basicMiddlewares');
-const checkToken = require('./../middlewares/checkToken');
-const contestController = require('./../controllers/contestController');
-const upload = require('./../utils/fileUpload');
+const { checkToken } = require('./../middlewares/checkToken');
+const {
+  onlyForCreative,
+  canGetContest,
+} = require('./../middlewares/basicMiddlewares');
+const {
+  getContests,
+  getCustomersContests,
+  getContestById,
+  updateContest,
+  dataForContest,
+} = require('./../controllers/contestController');
+const { updateContestFile } = require('./../utils/fileUpload');
 
 // buyer=customer
 // creative=creator
 
+//contests
 const contestRouter = Router();
-// /contests
 
-contestRouter.get(
-  '/getAllContests',
-  checkToken.checkToken,
-  basicMiddlewares.onlyForCreative,
-  contestController.getContests
-);
+contestRouter.use(checkToken);
 
-contestRouter.get(
-  '/',
-  checkToken.checkToken,
-  contestController.getCustomersContests
-);
+contestRouter.get('/all', onlyForCreative, getContests);
 
-contestRouter.get(
-  '/:contestId',
-  checkToken.checkToken,
-  basicMiddlewares.canGetContest,
-  contestController.getContestById
-);
+contestRouter.get('/customers', getCustomersContests);
 
-contestRouter.patch(
-  '/updateContest',
-  checkToken.checkToken,
-  upload.updateContestFile,
-  contestController.updateContest
-);
+contestRouter.post('/dataForContest', dataForContest);
 
-contestRouter.post(
-  '/dataForContest',
-  checkToken.checkToken,
-  contestController.dataForContest
-);
+contestRouter
+  .route('/:contestId')
+  .get(canGetContest, getContestById)
+  .patch(updateContestFile, updateContest);
 
 module.exports = contestRouter;
