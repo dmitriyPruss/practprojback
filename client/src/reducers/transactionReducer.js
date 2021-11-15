@@ -3,7 +3,7 @@ import ACTION_TYPES from '../actions/actionTypes';
 const initialState = {
   isFetching: false,
   error: null,
-  transactionsData: [],
+  transactions: [],
 };
 
 export default function (state = initialState, action) {
@@ -13,9 +13,9 @@ export default function (state = initialState, action) {
       return { ...state, isFetching: true };
     }
     case ACTION_TYPES.GET_TRANSACTION_SUCCESS: {
-      const { transactionsData } = action;
+      const { transactions } = action;
 
-      return { ...state, isFetching: false, transactionsData };
+      return { ...state, isFetching: false, transactions };
     }
     case ACTION_TYPES.GET_TRANSACTION_ERROR: {
       const { error } = action;

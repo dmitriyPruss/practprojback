@@ -10,9 +10,9 @@ export function * getTransactionSaga () {
   yield put(getTransactionRequest());
 
   try {
-    const { data: transactionsData } = yield API.getTransactions();
+    const { data: transactions } = yield API.getTransactions();
 
-    yield put(getTransactionSuccess(transactionsData));
+    yield put(getTransactionSuccess(transactions));
   } catch (error) {
     yield put(getTransactionError(error));
   }

@@ -7,7 +7,7 @@ const axiosSets = {
 
 const apiInstance = axios.create(axiosSets);
 
-const transactionsData = [
+const transactions = [
   { id: 1, date: '2021-08-31', operationType: 'INCOME', amount: 10 },
   { id: 2, date: '2021-09-01', operationType: 'INCOME', amount: 20 },
   { id: 3, date: '2021-09-04', operationType: 'EXPENCE', amount: 40 },
@@ -17,4 +17,4 @@ const transactionsData = [
 
 // export const getTransactions = () => apiInstance.get('/transactions');
 
-export const getTransactions = async () => await { data: transactionsData };
+export const getTransactions = async () => await { data: transactions };

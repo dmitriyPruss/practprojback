@@ -62,7 +62,7 @@ const mapStateToProps = state => {
     userStore: {
       data: { firstName, lastName },
     },
-    transactions: { transactionsData: transactions, error, isFetching },
+    transactions: { transactions: transactions, error, isFetching },
   } = state;
 
   return { firstName, lastName, transactions, error, isFetching };

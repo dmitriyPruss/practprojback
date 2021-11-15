@@ -303,9 +303,9 @@ export const getTransactionRequest = () => ({
   type: ACTION.GET_TRANSACTION_REQUEST,
 });
 
-export const getTransactionSuccess = transactionsData => ({
+export const getTransactionSuccess = transactions => ({
   type: ACTION.GET_TRANSACTION_SUCCESS,
-  transactionsData,
+  transactions,
 });
 
 export const getTransactionError = error => ({

@@ -3,6 +3,7 @@ const { checkToken } = require('./../middlewares/checkToken');
 const {
   onlyForCreative,
   canGetContest,
+  parseQuery,
 } = require('./../middlewares/basicMiddlewares');
 const {
   getContests,
@@ -13,15 +14,11 @@ const {
 } = require('./../controllers/contestController');
 const { updateContestFile } = require('./../utils/fileUpload');
 
-// buyer=customer
-// creative=creator
-
-//contests
 const contestRouter = Router();
 
 contestRouter.use(checkToken);
 
-contestRouter.get('/all', onlyForCreative, getContests);
+contestRouter.get('/all', onlyForCreative, parseQuery, getContests);
 
 contestRouter.get('/customers', getCustomersContests);
 
